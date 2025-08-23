@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Avatar, Dropdown, Button, Drawer, Badge, Space } from "antd";
+import { Avatar, Dropdown, Button, Drawer, Badge, Space, Divider } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import logoImage from "../assets/logo.png";
 import {
@@ -9,6 +9,8 @@ import {
   SettingOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
+import ChangePassword from "./ChangePassword";
+import EditProfile from "./EditProfile";
 
 const Navbar = ({ showDrawer }) => {
   const navigate = useNavigate();
@@ -24,21 +26,29 @@ const Navbar = ({ showDrawer }) => {
     {
       key: "profile",
       label: (
-        <Link to="/profile" className="flex items-center gap-2 px-1 py-2">
-          <UserOutlined /> Profile
-        </Link>
+        <div className="!cursor-default">
+          <div className="flex gap-1">
+            <Avatar size={47} className="mt-[4px]" icon={<UserOutlined />} />
+            <div>
+              <h2>Shah Rukh Khan</h2>
+              <p className="bg-[#006699] text-center text-[#FFF] px-3 rounded-full">
+                Admin
+              </p>
+            </div>
+          </div>
+
+          <Divider className="!mb-[0px] !mt-[1px] !bg-gray-300 " />
+        </div>
       ),
+    },
+
+    {
+      key: "edit-profile",
+      label: <EditProfile />,
     },
     {
       key: "change-password",
-      label: (
-        <Link
-          to="/change-password"
-          className="flex items-center gap-2 px-1 py-2"
-        >
-          <SettingOutlined /> Change Password
-        </Link>
-      ),
+      label: <ChangePassword />,
     },
     {
       key: "logout",
@@ -91,7 +101,7 @@ const Navbar = ({ showDrawer }) => {
               menu={{ items: profileMenuItems }}
               trigger={["click"]}
               placement="bottomRight"
-              overlayClassName="w-48"
+              overlayClassName="w-64"
             >
               <Avatar
                 icon={<UserOutlined className="" />}

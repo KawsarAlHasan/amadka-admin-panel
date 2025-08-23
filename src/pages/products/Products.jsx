@@ -2,6 +2,7 @@ import { Button, Input, Space, Table, Tag, Image } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useAllProducts } from "../../services/productsService";
 import { useState } from "react";
+import AddNewProduct from "./AddNewProduct";
 
 const { Search } = Input;
 
@@ -126,7 +127,7 @@ function Products() {
           style={{ width: 300 }}
         />
 
-        <Button type="primary">New Product Upload</Button>
+        <AddNewProduct />
       </div>
 
       <Table

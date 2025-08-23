@@ -1,0 +1,106 @@
+.luxury-modal .ant-modal-header {
+  background: linear-gradient(135deg, #0c0c0c 0%, #2d2d2d 100%);
+  border-bottom: 1px solid #444;
+}
+
+.luxury-modal .ant-modal-title {
+  color: #f8f8f8;
+  font-weight: 600;
+}
+
+.luxury-modal .ant-modal-close {
+  color: #f8f8f8;
+}
+
+.luxury-modal .ant-modal-body {
+  padding: 24px;
+  background-color: #f8f8f8;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.upload-button {
+  background: linear-gradient(135deg, #0c0c0c 0%, #2d2d2d 100%);
+  border: none;
+  font-weight: 500;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.upload-button:hover {
+  background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.product-form .ant-form-item-label > label {
+  font-weight: 500;
+  color: #333;
+}
+
+.price-row {
+  display: flex;
+  gap: 16px;
+}
+
+.price-input {
+  flex: 1;
+}
+
+.tag-input-group {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  background: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 100%);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  border: 1px solid #d9d9d9;
+}
+
+.tag svg {
+  margin-left: 4px;
+  cursor: pointer;
+  color: #888;
+}
+
+.tag svg:hover {
+  color: #ff4d4f;
+}
+
+.ant-upload.ant-upload-select {
+  display: block;
+}
+
+.ant-divider-inner-text {
+  font-weight: 600;
+  color: #1d1d1d;
+}
+
+.ant-input-number, .ant-input, .ant-select-selector, .ant-input-textarea {
+  border: 1px solid #d9d9d9;
+  border-radius: 4px;
+}
+
+.ant-input-number:focus, .ant-input:focus, .ant-select-focused .ant-select-selector, .ant-input-textarea:focus {
+  border-color: #0c0c0c;
+  box-shadow: 0 0 0 2px rgba(12, 12, 12, 0.2);
+}
+
+.ant-btn-primary {
+  background: linear-gradient(135deg, #0c0c0c 0%, #2d2d2d 100%);
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background: linear-gradient(135deg, #2d2d2d 0%, #4a4a4a 100%) !important;
+}
