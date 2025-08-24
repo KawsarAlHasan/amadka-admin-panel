@@ -111,7 +111,7 @@ function Products() {
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button type="primary" icon={<EditOutlined />} />
+          <Button type="primary" className="custom-primary-btn" icon={<EditOutlined />} />
           <Button danger icon={<DeleteOutlined />} />
         </Space>
       ),

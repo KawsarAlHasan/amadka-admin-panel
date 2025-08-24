@@ -7,6 +7,17 @@
   background-color: #e91111 !important;
 } */
 
+.custom-primary-btn {
+  background-color: #006699 !important;
+  color: #ffffff !important;
+}
+
+.custom-primary-btn:hover,
+.custom-primary-btn:focus {
+  background-color: #005580 !important; 
+  border-color: #005580 !important;
+}
+
 .ant-menu .ant-menu-item-selected {
   background-color: #006699 !important;
   color: #ffffff !important;

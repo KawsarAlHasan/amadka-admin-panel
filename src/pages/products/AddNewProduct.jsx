@@ -93,21 +93,51 @@ const AddNewProduct = () => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal} className="upload-button">
+      <Button type="primary" onClick={showModal} className="upload-button custom-primary-btn">
         New Product Upload
       </Button>
       <Modal
-        title="Upload Luxury Product"
+        title="Upload New Product"
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
         width={800}
         okText="Upload Product"
         cancelText="Cancel"
-        className="luxury-modal"
+        className="luxury-modal "
       >
         <Form form={form} layout="vertical" className="product-form">
           <Divider orientation="left">Basic Information</Divider>
+
+          <Form.Item
+            name="agent_name"
+            label="Agent Name"
+            rules={[
+              { required: true, message: "Please input the agent name!" },
+            ]}
+          >
+            <Select
+              showSearch
+              placeholder="Enter agent name"
+              optionFilterProp="label"
+              // onChange={onChange}
+              // onSearch={onSearch}
+              options={[
+                {
+                  value: "jack",
+                  label: "Jack",
+                },
+                {
+                  value: "lucy",
+                  label: "Lucy",
+                },
+                {
+                  value: "tom",
+                  label: "Tom",
+                },
+              ]}
+            />
+          </Form.Item>
 
           <Form.Item
             name="product_name"
@@ -197,72 +227,39 @@ const AddNewProduct = () => {
 
           <Divider orientation="left">Variants</Divider>
 
-          <Form.Item label="Available Sizes">
-            <div className="tag-input-group">
-              <Input
-                placeholder="Add size (e.g., S, M, L)"
-                value={newSize}
-                onChange={(e) => setNewSize(e.target.value)}
-                onPressEnter={addSize}
-                style={{ width: "calc(100% - 80px)", marginRight: "8px" }}
-              />
-              <Button type="default" icon={<PlusOutlined />} onClick={addSize}>
-                Add
-              </Button>
-            </div>
-            <div className="tag-list">
-              {sizes.map((size) => (
-                <span key={size} className="tag">
-                  {size}
-                  <DeleteOutlined onClick={() => removeSize(size)} />
-                </span>
-              ))}
-            </div>
+          <Form.Item label="Available Sizes" name="sizes">
+            <Select
+              mode="tags"
+              style={{ width: "100%" }}
+              placeholder="Select or add sizes"
+              options={[
+                { value: "XS", label: "XS" },
+                { value: "S", label: "S" },
+                { value: "M", label: "M" },
+                { value: "L", label: "L" },
+                { value: "XL", label: "XL" },
+              ]}
+            />
           </Form.Item>
 
-          <Form.Item label="Available Colors">
-            <div className="tag-input-group">
-              <Input
-                placeholder="Add color (e.g., Red, Blue)"
-                value={newColor}
-                onChange={(e) => setNewColor(e.target.value)}
-                onPressEnter={addColor}
-                style={{ width: "calc(100% - 80px)", marginRight: "8px" }}
-              />
-              <Button type="default" icon={<PlusOutlined />} onClick={addColor}>
-                Add
-              </Button>
-            </div>
-            <div className="tag-list">
-              {colors.map((color) => (
-                <span key={color} className="tag">
-                  {color}
-                  <DeleteOutlined onClick={() => removeColor(color)} />
-                </span>
-              ))}
-            </div>
+          <Form.Item label="Available Colors" name="colors">
+            <Select
+              mode="tags"
+              style={{ width: "100%" }}
+              placeholder="Select or add colors"
+              options={[
+                { value: "Red", label: "Red" },
+                { value: "Blue", label: "Blue" },
+                { value: "Black", label: "Black" },
+                { value: "White", label: "White" },
+              ]}
+            />
           </Form.Item>
 
           <Divider orientation="left">Affiliate Information</Divider>
 
-          <Form.Item
-            name="affiate_link"
-            label="Affiliate Link"
-            rules={[
-              { required: true, message: "Please input the affiliate link!" },
-            ]}
-          >
+          <Form.Item name="affiate_link" label="Affiliate Link">
             <Input placeholder="https://affiliate.example.com/product/1" />
-          </Form.Item>
-
-          <Form.Item
-            name="agent_name"
-            label="Agent Name"
-            rules={[
-              { required: true, message: "Please input the agent name!" },
-            ]}
-          >
-            <Input placeholder="Enter agent name" />
           </Form.Item>
         </Form>
       </Modal>

@@ -1,12 +1,35 @@
-import { Avatar, Space, Table } from "antd";
+import { Avatar, Space, Table, message, Modal } from "antd";
 import IsError from "../../components/IsError";
 import IsLoading from "../../components/IsLoading";
 import { useAdministrators } from "../../services/administratorsService";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import AddAdmin from "./AddAdmin";
+import AdminEdit from "./AdminEdit";
 
 function Administrators() {
   const { administrators, isLoading, isError, error, refetch } =
     useAdministrators();
+
+  const showDeleteConfirm = (adminId) => {
+    Modal.confirm({
+      title: "Are you sure you want to delete this admin?",
+      content: "This action cannot be undone.",
+      okText: "Yes, Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      async onOk() {
+        try {
+          // await API.post(`/admin/administrators/${adminId}/action/`, {
+          //   action: "delete",
+          // });
+          message.success("Admin deleted successfully!");
+          // refetch();
+        } catch (err) {
+          message.error(err.response?.data?.error || "Failed to delete admin");
+        }
+      },
+    });
+  };
 
   const columns = [
     {
@@ -38,26 +61,6 @@ function Administrators() {
       key: "phone",
       render: (phone) => <span className="">{phone}</span>,
     },
-    // {
-    //   title: <span >Answers</span>,
-    //   dataIndex: "question_answer",
-    //   key: "question_answer",
-    //   render: (question_answer) => (
-    //     <ViewAnswerModal question_answer={question_answer} />
-    //   ),
-    // },
-    // {
-    //   title: <span >Status</span>,
-    //   key: "status",
-    //   render: () => (
-    //     <Tag
-    //       className="w-full mr-5 text-center text-[20px] py-3"
-    //       color="#359700"
-    //     >
-    //       Active
-    //     </Tag>
-    //   ),
-    // },
     {
       title: <span>Has Access To</span>,
       dataIndex: "role",
@@ -67,18 +70,26 @@ function Administrators() {
     {
       title: <span>Action</span>,
       key: "action",
-      render: (_, record) => (
-        <Space size="middle">
-          <EditOutlined
-            // onClick={() => handleUserDetails(record)}
-            className="text-[23px] bg-[#006699] p-1 rounded-sm text-white hover:text-blue-300 cursor-pointer"
-          />
-          <DeleteOutlined
-            className="text-[23px] bg-[#E30000] p-1 rounded-sm text-white hover:text-red-300 cursor-pointer"
-            // onClick={() => showBlockConfirm(record.id)}
-          />
-        </Space>
-      ),
+      render: (_, record) => {
+        const isSuperAdmin = record.role === "superadmin";
+
+        return (
+          <Space size="middle">
+            <AdminEdit adminProfile={record} />
+
+            <DeleteOutlined
+              className={`text-[23px] bg-[#E30000] p-1 rounded-sm text-white ${
+                isSuperAdmin
+                  ? "cursor-not-allowed opacity-50"
+                  : "hover:text-red-300 cursor-pointer"
+              }`}
+              onClick={
+                isSuperAdmin ? undefined : () => showDeleteConfirm(record.id)
+              }
+            />
+          </Space>
+        );
+      },
     },
   ];
 
@@ -92,6 +103,7 @@ function Administrators() {
 
   return (
     <div className="p-4">
+      <AddAdmin />
       <Table
         columns={columns}
         dataSource={administrators}

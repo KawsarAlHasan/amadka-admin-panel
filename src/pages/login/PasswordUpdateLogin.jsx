@@ -60,7 +60,7 @@ const PasswordUpdateLogin = () => {
                 <Button
                   type="primary"
                   htmlType="submit"
-                  className="w-full py-6 text-[18px] font-semibold my-main-button"
+                  className="w-full py-6 text-[18px] font-semibold my-main-button custom-primary-btn"
                   loading={loading}
                 >
                   {loading ? "Logging in..." : "Login"}
