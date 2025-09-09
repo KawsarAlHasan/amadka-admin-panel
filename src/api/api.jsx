@@ -1,6 +1,65 @@
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
+export const API = axios.create({
+  baseURL: "http://localhost:3000/api",
+});
+
+API.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+// get admin profile
+export const useAdminProfile = () => {
+  const getData = async () => {
+    const response = await API.get("/admin/me");
+    return response.data;
+  };
+
+  const {
+    data: admin = null,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["admin"],
+    queryFn: getData,
+  });
+
+  return { admin, isLoading, isError, error, refetch };
+};
+
+// Get all products
+export const useGetAllProducts = ({ page = 1, limit = 10, status, product_name  } = {}) => {
+  const getData = async () => {
+    const response = await API.get("/product/all", {
+      params: { page, limit, status, product_name },
+    });
+    return response.data;
+  };
+
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allProducts", page, limit, status, product_name],
+    queryFn: getData,
+    keepPreviousData: true,
+  });
+
+  const { data: allProducts = [], pagination = {} } = response;
+
+  return { allProducts, pagination, isLoading, isError, error, refetch };
+};
+
 // users list
 export const getMockUsers = async ({ page = 1, limit = 10 }) => {
   const res = await axios.get("/users_100.json");

@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Form, Input, Button, Checkbox, message } from "antd";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
+import { API } from "../../api/api";
 // import { API } from "../../api/api";
 
 const Login = () => {
@@ -10,13 +11,13 @@ const Login = () => {
   const onFinish = async (values) => {
     setLoading(true); // Start loading when submitting form
     try {
-      // const response = await API.post("/admin/login", {
-      //   email: values.email,
-      //   password: values.password,
-      // });
+      const response = await API.post("/admin/login", {
+        email: values.email,
+        password: values.password,
+      });
 
       // // If successful, save the token in localStorage
-      // localStorage.setItem("token", response.data.data.token);
+      localStorage.setItem("token", response.data.accesstoken);
 
       // Show success message
       message.success("Login successful!");
@@ -26,7 +27,7 @@ const Login = () => {
     } catch (error) {
       // Show error message
       message.error(
-        "Login failed. Please try again." // error.response?.data?.message
+        error.response?.data?.error || "Login failed. Please try again."
       );
     } finally {
       setLoading(false); // Stop loading after request

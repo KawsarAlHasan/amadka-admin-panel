@@ -3,8 +3,13 @@ import { AiOutlineUsergroupAdd } from "react-icons/ai";
 import { FaCircleDollarToSlot } from "react-icons/fa6";
 import { FaUsers } from "react-icons/fa";
 import { FaSackDollar } from "react-icons/fa6";
+import { useAdminProfile } from "../../api/api";
 
 function Dashboard() {
+
+  const {admin, isLoading, isError, error, refetch} = useAdminProfile()
+
+
   return (
     <div>
       <div className="bg-white w-full p-4 rounded-md">

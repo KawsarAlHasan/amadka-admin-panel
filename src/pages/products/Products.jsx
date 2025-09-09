@@ -1,22 +1,48 @@
 import { Button, Input, Space, Table, Tag, Image } from "antd";
-import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
-import { useAllProducts } from "../../services/productsService";
+import {
+  EditOutlined,
+  DeleteOutlined,
+  EyeOutlined,
+  ReloadOutlined,
+} from "@ant-design/icons";
 import { useState } from "react";
 import AddNewProduct from "./AddNewProduct";
+import { useGetAllProducts } from "../../api/api";
+import IsError from "../../components/IsError";
+import { LuSend } from "react-icons/lu";
+import ViewProduct from "./ViewProduct";
 
 const { Search } = Input;
 
 function Products() {
+  const [searchValue, setSearchValue] = useState("");
   const [filter, setFilter] = useState({
     page: 1,
     limit: 10,
   });
 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [productDetails, setProductDetails] = useState(null);
+
   const { allProducts, pagination, isLoading, isError, error, refetch } =
-    useAllProducts(filter);
+    useGetAllProducts(filter);
 
   const onSearch = (value) => {
-    console.log("Searching:", value);
+    setFilter({
+      page: 1,
+      limit: 10,
+      product_name: value || undefined,
+    });
+  };
+
+  const handleView = (record) => {
+    setProductDetails(record);
+    setIsModalOpen(true);
+  };
+
+  const handleModalClose = () => {
+    setProductDetails(null);
+    setIsModalOpen(false);
   };
 
   const handleTableChange = (pagination, filters, sorter) => {
@@ -30,20 +56,21 @@ function Products() {
   const columns = [
     {
       title: "SL no.",
-      dataIndex: "sl_no",
-      key: "sl_no",
-      render: (sl_no) => <span>#{sl_no}</span>,
+      dataIndex: "id",
+      render: (_, __, index) => {
+        return <span>#{(filter.page - 1) * filter.limit + (index + 1)}</span>;
+      },
     },
     {
       title: "Product Name",
       dataIndex: "product_name",
       key: "product_name",
     },
-    {
-      title: "Description",
-      dataIndex: "description",
-      key: "description",
-    },
+    // {
+    //   title: "Description",
+    //   dataIndex: "description",
+    //   key: "description",
+    // },
     {
       title: "Images",
       dataIndex: "images",
@@ -101,9 +128,20 @@ function Products() {
       dataIndex: "affiate_link",
       key: "affiate_link",
       render: (link) => (
-        <a href={link} target="_blank" rel="noreferrer">
-          Copy Link
-        </a>
+        <Button href={link} target="_blank">
+          Affiliate Link
+          <LuSend />
+        </Button>
+      ),
+    },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status) => (
+        <Tag color={status === "active" ? "green" : "red"}>
+          {status} Status{" "}
+        </Tag>
       ),
     },
     {
@@ -111,7 +149,12 @@ function Products() {
       key: "action",
       render: (_, record) => (
         <Space>
-          <Button type="primary" className="custom-primary-btn" icon={<EditOutlined />} />
+          <Button icon={<EyeOutlined />} onClick={() => handleView(record)} />
+          <Button
+            type="primary"
+            className="custom-primary-btn"
+            icon={<EditOutlined />}
+          />
           <Button danger icon={<DeleteOutlined />} />
         </Space>
       ),
@@ -121,28 +164,53 @@ function Products() {
   return (
     <div>
       <div className="flex justify-between mb-4">
-        <Search
-          placeholder="Products Search"
-          onSearch={onSearch}
-          style={{ width: 300 }}
-        />
+        <div className="">
+          <Search
+            placeholder="Products Search"
+            value={searchValue} // Controlled value
+            onChange={(e) => setSearchValue(e.target.value)}
+            onSearch={onSearch}
+            style={{ width: 300 }}
+            allowClear
+          />
+
+          <Button
+            onClick={() => {
+              setSearchValue("");
+              onSearch("");
+            }}
+            icon={<ReloadOutlined />}
+            className="ml-4"
+          >
+            Reset
+          </Button>
+        </div>
 
         <AddNewProduct />
       </div>
 
+      {isError && <IsError error={error} refetch={refetch} />}
+
       <Table
         columns={columns}
         dataSource={allProducts}
-        rowKey="sl_no"
+        rowKey="id"
         pagination={{
           current: filter.page,
           pageSize: filter.limit,
-          total: pagination?.totalProduct,
+          total: pagination?.total,
           showSizeChanger: true,
-          pageSizeOptions: ["10", "20", "50", "100"],
+          pageSizeOptions: ["5", "10", "20", "50", "100"],
         }}
         onChange={handleTableChange}
         loading={isLoading}
+      />
+
+      <ViewProduct
+        data={productDetails}
+        isOpen={isModalOpen}
+        onClose={handleModalClose}
+        refetch={refetch}
       />
     </div>
   );

@@ -12,6 +12,7 @@ import CheckCode from "../pages/login/CheckCode";
 import Administrators from "../pages/administrators/Administrators";
 import Payments from "../pages/payments/Payments";
 import Products from "../pages/products/Products";
+import PrivateRoute from "./PrivateRoute";
 
 export const router = createBrowserRouter([
   {
@@ -36,7 +37,11 @@ export const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <MainLayout />,
+    element: (
+      <PrivateRoute>
+        <MainLayout />
+      </PrivateRoute>
+    ),
     children: [
       {
         path: "/",

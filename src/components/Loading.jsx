@@ -7,7 +7,7 @@ function Loading() {
   return (
     <div className="flex flex-col items-center justify-center h-screen">
       <Spin indicator={antIcon} size="large" />
-      <div className="mt-4 text-lg font-medium text-white flex items-center">
+      <div className="mt-4 text-lg font-medium  flex items-center">
         Loading
         <span className="ml-1 flex space-x-1">
           <span className="animate-bounce [animation-delay:0ms]">.</span>

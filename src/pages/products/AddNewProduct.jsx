@@ -10,11 +10,8 @@ import {
   Divider,
   message,
 } from "antd";
-import {
-  UploadOutlined,
-  PlusOutlined,
-  DeleteOutlined,
-} from "@ant-design/icons";
+import { UploadOutlined } from "@ant-design/icons";
+import { API } from "../../api/api";
 
 const { TextArea } = Input;
 const { Option } = Select;
@@ -25,29 +22,49 @@ const AddNewProduct = () => {
   const [imageList, setImageList] = useState([]);
   const [sizes, setSizes] = useState([]);
   const [colors, setColors] = useState([]);
-  const [newSize, setNewSize] = useState("");
-  const [newColor, setNewColor] = useState("");
 
   const showModal = () => {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    form
-      .validateFields()
-      .then((values) => {
-        console.log("Form values:", values);
-        // Here you would typically send the data to your backend
+  const handleOk = async () => {
+    try {
+      await form.validateFields();
+      const values = form.getFieldsValue();
+      const productData = {
+        images: imageList.map((file) => file.url || file.thumbUrl),
+        product_name: values.product_name,
+        description: values.description,
+        sizes,
+        colors,
+        price: values.price,
+        offer_price: values.offer_price,
+        affiate_link: values.affiate_link,
+        agent_name: values.agent_name,
+        category: values.category,
+      };
+
+      console.log("Product Data:", productData);
+
+      // Assuming API.post() makes an API request to save product data
+      const response = await API.post("/product/create", productData);
+
+      console.log("API Response:", response.data);
+
+      if (response.data.success) {
         message.success("Product uploaded successfully!");
         setIsModalOpen(false);
         form.resetFields();
         setImageList([]);
         setSizes([]);
         setColors([]);
-      })
-      .catch((info) => {
-        console.log("Validate Failed:", info);
-      });
+      } else {
+        message.error("Failed to upload the product.");
+      }
+    } catch (error) {
+      console.log("Validate Failed:", error);
+      message.error("Please fill in all the required fields.");
+    }
   };
 
   const handleCancel = () => {
@@ -62,30 +79,8 @@ const AddNewProduct = () => {
     setImageList(fileList);
   };
 
-  const addSize = () => {
-    if (newSize && !sizes.includes(newSize)) {
-      setSizes([...sizes, newSize]);
-      setNewSize("");
-    }
-  };
-
-  const removeSize = (sizeToRemove) => {
-    setSizes(sizes.filter((size) => size !== sizeToRemove));
-  };
-
-  const addColor = () => {
-    if (newColor && !colors.includes(newColor)) {
-      setColors([...colors, newColor]);
-      setNewColor("");
-    }
-  };
-
-  const removeColor = (colorToRemove) => {
-    setColors(colors.filter((color) => color !== colorToRemove));
-  };
-
   const uploadProps = {
-    beforeUpload: () => false, // Prevent automatic upload
+    beforeUpload: () => false,
     listType: "picture",
     onChange: handleImageUpload,
     multiple: true,
@@ -93,7 +88,11 @@ const AddNewProduct = () => {
 
   return (
     <>
-      <Button type="primary" onClick={showModal} className="upload-button custom-primary-btn">
+      <Button
+        type="primary"
+        onClick={showModal}
+        className="upload-button custom-primary-btn"
+      >
         New Product Upload
       </Button>
       <Modal
@@ -105,39 +104,10 @@ const AddNewProduct = () => {
         okText="Upload Product"
         cancelText="Cancel"
         className="luxury-modal "
+        maskClosable={false}
       >
         <Form form={form} layout="vertical" className="product-form">
           <Divider orientation="left">Basic Information</Divider>
-
-          <Form.Item
-            name="agent_name"
-            label="Agent Name"
-            rules={[
-              { required: true, message: "Please input the agent name!" },
-            ]}
-          >
-            <Select
-              showSearch
-              placeholder="Enter agent name"
-              optionFilterProp="label"
-              // onChange={onChange}
-              // onSearch={onSearch}
-              options={[
-                {
-                  value: "jack",
-                  label: "Jack",
-                },
-                {
-                  value: "lucy",
-                  label: "Lucy",
-                },
-                {
-                  value: "tom",
-                  label: "Tom",
-                },
-              ]}
-            />
-          </Form.Item>
 
           <Form.Item
             name="product_name"
@@ -239,6 +209,7 @@ const AddNewProduct = () => {
                 { value: "L", label: "L" },
                 { value: "XL", label: "XL" },
               ]}
+              onChange={setSizes}
             />
           </Form.Item>
 
@@ -253,12 +224,38 @@ const AddNewProduct = () => {
                 { value: "Black", label: "Black" },
                 { value: "White", label: "White" },
               ]}
+              onChange={setColors}
             />
           </Form.Item>
 
           <Divider orientation="left">Affiliate Information</Divider>
 
-          <Form.Item name="affiate_link" label="Affiliate Link">
+          <Form.Item
+            name="agent_name"
+            label="Agent Name"
+            rules={[
+              { required: true, message: "Please input the agent name!" },
+            ]}
+          >
+            <Select
+              showSearch
+              placeholder="Enter agent name"
+              optionFilterProp="label"
+              options={[
+                { value: "jack", label: "Jack" },
+                { value: "lucy", label: "Lucy" },
+                { value: "tom", label: "Tom" },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="affiate_link"
+            label="Affiliate Link"
+            rules={[
+              { required: true, message: "Please input the affiliate link!" },
+            ]}
+          >
             <Input placeholder="https://affiliate.example.com/product/1" />
           </Form.Item>
         </Form>
