@@ -13,6 +13,7 @@ import Administrators from "../pages/administrators/Administrators";
 import Payments from "../pages/payments/Payments";
 import Products from "../pages/products/Products";
 import PrivateRoute from "./PrivateRoute";
+import Categories from "../pages/categories/Categories";
 
 export const router = createBrowserRouter([
   {
@@ -63,6 +64,11 @@ export const router = createBrowserRouter([
         path: "/payments",
         element: <Payments />,
       },
+      {
+        path: "/categories",
+        element: <Categories />,
+      },
+      
       //   {
       //     path: "/tasks",
       //     element: <Tasks />,

@@ -34,6 +34,74 @@ export const useAdminProfile = () => {
   return { admin, isLoading, isError, error, refetch };
 };
 
+
+
+
+
+
+// Get all Categories
+export const useGetAllCategories = ({ status  } = {}) => {
+
+
+  const getData = async () => {
+    const response = await API.get("/category/all", {
+      params: { status },
+    });
+    return response.data;
+  };
+
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allCategories", status],
+    queryFn: getData,
+    keepPreviousData: true,
+  });
+
+  const { data: allCategories = [] } = response;
+
+  return { allCategories, isLoading, isError, error, refetch };
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // Get all products
 export const useGetAllProducts = ({ page = 1, limit = 10, status, product_name  } = {}) => {
   const getData = async () => {
