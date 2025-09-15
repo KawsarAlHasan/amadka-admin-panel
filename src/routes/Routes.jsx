@@ -14,6 +14,7 @@ import Payments from "../pages/payments/Payments";
 import Products from "../pages/products/Products";
 import PrivateRoute from "./PrivateRoute";
 import Categories from "../pages/categories/Categories";
+import Agents from "../pages/agents/Agents";
 
 export const router = createBrowserRouter([
   {
@@ -68,27 +69,11 @@ export const router = createBrowserRouter([
         path: "/categories",
         element: <Categories />,
       },
-      
-      //   {
-      //     path: "/tasks",
-      //     element: <Tasks />,
-      //   },
-      //   {
-      //     path: "/leaderboard",
-      //     element: <Leaderboard />,
-      //   },
-      //   {
-      //     path: "/profile",
-      //     element: <Profile />,
-      //   },
-      //   {
-      //     path: "/terms-conditions",
-      //     element: <TermsConditions />,
-      //   },
-      //   {
-      //     path: "/privacy-policy",
-      //     element: <PrivacyPolicy />,
-      //   },
+
+      {
+        path: "/agents",
+        element: <Agents />,
+      },
 
       {
         path: "/test",

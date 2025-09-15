@@ -1,23 +1,24 @@
 import React, { useState } from "react";
-import { API, useGetAllCategories } from "../../api/api";
+import { API, useGetAllAgents } from "../../api/api";
 import IsError from "../../components/IsError";
 import IsLoading from "../../components/IsLoading";
 import { Image, message, Modal, Space, Table, Tag, Select, Button } from "antd";
-import EditCategory from "./EditCategory";
 import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
-import AddCategory from "./AddCategory";
+import EditAgent from "./EditAgent";
+import AddAgent from "./AddAgent";
 
-function Categories() {
+function Agents() {
   const [statusFilter, setStatusFilter] = useState(""); // State for status filter
-  const { allCategories, isLoading, isError, error, refetch } =
-    useGetAllCategories({ status: statusFilter }); // Fetch categories based on filter
+  const { allAgents, isLoading, isError, error, refetch } = useGetAllAgents({
+    status: statusFilter,
+  }); // Fetch categories based on filter
 
   const [isModalOpen, setIsModalOpen] = React.useState(false);
-  const [categoryData, setCategoryData] = React.useState(null);
+  const [agentData, setAgentData] = React.useState(null);
 
   // Status change modal states
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [selectedAgent, setSelectedAgent] = useState(null);
   const [newStatus, setNewStatus] = useState("");
 
   const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
@@ -30,32 +31,30 @@ function Categories() {
     return <IsError error={error} refetch={refetch} />;
   }
 
-  const handleEdit = (categoryDetail) => {
-    setCategoryData(categoryDetail);
+  const handleEdit = (record) => {
+    setAgentData(record);
     setIsModalOpen(true);
   };
 
   const handleModalClose = () => {
-    setCategoryData(null); // Reset the details
+    setAgentData(null); // Reset the details
     setIsModalOpen(false); // Close modal
   };
 
   const showDeleteConfirm = (id) => {
     Modal.confirm({
-      title: "Are you sure you want to delete this category?",
+      title: "Are you sure you want to delete this agent?",
       content: "This action cannot be undone.",
       okText: "Yes, Delete",
       okType: "danger",
       cancelText: "Cancel",
       async onOk() {
         try {
-          await API.delete(`/category/${id}`);
-          message.success("Category deleted successfully!");
+          await API.delete(`/agent/${id}`);
+          message.success("Agent deleted successfully!");
           refetch();
         } catch (err) {
-          message.error(
-            err.response?.data?.error || "Failed to delete category"
-          );
+          message.error(err.response?.data?.error || "Failed to delete agent");
         }
       },
     });
@@ -63,29 +62,29 @@ function Categories() {
 
   // Status change modal open
   const openStatusModal = (record) => {
-    setSelectedCategory(record);
+    setSelectedAgent(record);
     setNewStatus(record.status); // default current status
     setIsStatusModalOpen(true);
   };
 
   // Status update API call
   const handleStatusChange = async () => {
-    if (!selectedCategory) return;
+    if (!selectedAgent) return;
 
     setIsStatusChangeLoading(true);
 
     try {
-      await API.patch(`/category/${selectedCategory.id}`, {
+      await API.patch(`/agent/${selectedAgent.id}`, {
         status: newStatus,
       });
-      message.success("Category status updated successfully!");
+      message.success("Agent status updated successfully!");
       setIsStatusModalOpen(false);
-      setSelectedCategory(null);
+      setSelectedAgent(null);
       setNewStatus("");
       refetch();
     } catch (err) {
       message.error(
-        err.response?.data?.error || "Failed to update category status"
+        err.response?.data?.error || "Failed to update Agent status"
       );
     } finally {
       setIsStatusChangeLoading(false);
@@ -94,17 +93,16 @@ function Categories() {
 
   const columns = [
     {
-      title: <span>Category Name</span>,
-      dataIndex: "category_name",
-      key: "category_name",
+      title: <span>Agent Name</span>,
+      dataIndex: "agent_name",
+      key: "agent_name",
       render: (_, record) => (
         <Space size="middle">
           <Image
             className="!w-[50px] !h-[50px] !rounded-full bg-gray-300 p-1"
-            src={record.category_image}
+            src={record.agent_image}
           />
-
-          <span className="font-bold">{record.category_name}</span>
+          <span className="font-bold">{record.agent_name}</span>
         </Space>
       ),
     },
@@ -114,14 +112,14 @@ function Categories() {
       dataIndex: "status",
       key: "status",
       render: (status, record) => (
-        <div className="flex items-center ">
+        <div className="flex items-center">
           {status === "Active" ? (
             <Tag color="green">Active</Tag>
           ) : (
             <Tag color="red">{status}</Tag>
           )}
           <Button
-            className="-ml-1"
+          className="-ml-1"
             title="Status Change"
             size="small"
             icon={<EditOutlined />}
@@ -164,7 +162,7 @@ function Categories() {
     <div>
       {/* Status filter */}
       <div className="flex justify-between mb-4">
-        <AddCategory refetch={refetch} />
+        <AddAgent refetch={refetch} />
 
         <Select
           value={statusFilter}
@@ -180,14 +178,14 @@ function Categories() {
 
       <Table
         columns={columns}
-        dataSource={allCategories}
+        dataSource={allAgents}
         rowKey="id"
         loading={isLoading}
         pagination={false}
       />
 
-      <EditCategory
-        categoryData={categoryData}
+      <EditAgent
+        agentData={agentData}
         isOpen={isModalOpen}
         onClose={handleModalClose}
         refetch={refetch}
@@ -195,14 +193,14 @@ function Categories() {
 
       {/* Status Change Modal */}
       <Modal
-        title="Change Category Status"
+        title="Change Agent Status"
         open={isStatusModalOpen}
         onOk={handleStatusChange}
         onCancel={() => setIsStatusModalOpen(false)}
         okText="Update"
         confirmLoading={isStatusChangeLoading}
       >
-        <p className="mb-2">Select new status for this category:</p>
+        <p className="mb-2">Select new status for this Agent:</p>
         <Select
           value={newStatus}
           onChange={(value) => setNewStatus(value)}
@@ -216,4 +214,4 @@ function Categories() {
   );
 }
 
-export default Categories;
+export default Agents;

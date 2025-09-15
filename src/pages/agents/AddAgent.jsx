@@ -5,7 +5,7 @@ import { API } from "../../api/api";
 
 const { Title } = Typography;
 
-const AddCategory = ({ refetch }) => {
+const AddAgent = ({ refetch }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
@@ -23,26 +23,26 @@ const AddCategory = ({ refetch }) => {
     setLoading(true);
     const formData = new FormData();
 
-    formData.append("category_name", values.category_name);
+    formData.append("agent_name", values.agent_name);
 
     if (
-      values.category_image &&
-      values.category_image[0] &&
-      values.category_image[0].originFileObj
+      values.agent_image &&
+      values.agent_image[0] &&
+      values.agent_image[0].originFileObj
     ) {
-      formData.append("category_image", values.category_image[0].originFileObj);
+      formData.append("agent_image", values.agent_image[0].originFileObj);
     }
 
     try {
-      const response = await API.post("/category/create", formData);
+      const response = await API.post("/agent/create", formData);
       if (response.status === 200 || response.status === 201) {
-        message.success(`${values.category_name} added successfully!`);
+        message.success(`${values.agent_name} added successfully!`);
         refetch();
         handleCancel();
       }
     } catch (error) {
-      message.error("Failed to add category. Please try again.");
-      console.error("AddCategory error:", error);
+      message.error("Failed to add agent. Please try again.");
+      console.error("Add agent error:", error);
     } finally {
       setLoading(false);
     }
@@ -51,11 +51,11 @@ const AddCategory = ({ refetch }) => {
   return (
     <>
       <Button className="custom-primary-btn" type="primary" onClick={showModal}>
-        + Add Category
+        + Add Agent
       </Button>
 
       <Modal
-        title={<Title level={4}>Add Category</Title>}
+        title={<Title level={4}>Add Agent</Title>}
         open={isModalOpen}
         onCancel={handleCancel}
         footer={null}
@@ -63,7 +63,7 @@ const AddCategory = ({ refetch }) => {
       >
         <Form layout="vertical" form={form} onFinish={onSubmit}>
           {/* Upload Image */}
-          <Form.Item label="Upload Image" name="category_image">
+          <Form.Item label="Upload Image" name="agent_image">
             <Upload
               listType="picture-card"
               beforeUpload={() => false}
@@ -72,11 +72,11 @@ const AddCategory = ({ refetch }) => {
               fileList={fileList}
               onChange={({ fileList: newFileList }) => {
                 setFileList(newFileList);
-                form.setFieldsValue({ category_image: newFileList });
+                form.setFieldsValue({ agent_image: newFileList });
               }}
               onRemove={() => {
                 setFileList([]);
-                form.setFieldsValue({ category_image: [] });
+                form.setFieldsValue({ agent_image: [] });
               }}
               onPreview={(file) => {
                 const src = file.url || URL.createObjectURL(file.originFileObj);
@@ -93,13 +93,13 @@ const AddCategory = ({ refetch }) => {
             </Upload>
           </Form.Item>
 
-          {/* Category Name */}
+          {/* Agent Name */}
           <Form.Item
-            label="Category Name"
-            name="category_name"
-            rules={[{ required: true, message: "Category name is required" }]}
+            label="Agent Name"
+            name="agent_name"
+            rules={[{ required: true, message: "Agent name is required" }]}
           >
-            <Input placeholder="Enter category name..." />
+            <Input placeholder="Enter agent name..." />
           </Form.Item>
 
           {/* Submit Button */}
@@ -120,4 +120,4 @@ const AddCategory = ({ refetch }) => {
   );
 };
 
-export default AddCategory;
+export default AddAgent;

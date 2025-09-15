@@ -31,6 +31,8 @@ const Sidebar = ({ onClick }) => {
     if (path === "/user-management") return ["2"];
     if (path === "/administrators") return ["3"];
     if (path === "/products") return ["products"];
+    if (path === "/categories") return ["categories"];
+    if (path === "/agents") return ["agents"];
     return ["1"];
   };
 
@@ -55,6 +57,18 @@ const Sidebar = ({ onClick }) => {
       icon: <FaBuildingFlag />,
       label: <Link to="/products">Products</Link>,
     },
+    {
+      key: "categories",
+      icon: <FaBuildingFlag />,
+      label: <Link to="/categories">Categories</Link>,
+    },
+    {
+      key: "agents",
+      icon: <FaBuildingFlag />,
+      label: <Link to="/agents">Agents</Link>,
+    },
+
+
 
     // Add logout as a menu item at the bottom
     {

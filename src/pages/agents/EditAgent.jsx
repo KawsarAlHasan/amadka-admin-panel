@@ -5,65 +5,65 @@ import { API } from "../../api/api";
 
 const { Title } = Typography;
 
-function EditCategory({ categoryData, isOpen, onClose, refetch }) {
+function EditAgent({ agentData, isOpen, onClose, refetch }) {
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState([]);
 
   useEffect(() => {
-    if (categoryData?.category_image) {
+    if (agentData?.agent_image) {
       setFileList([
         {
           uid: "-1",
           name: "Current Image",
           status: "done",
-          url: categoryData.category_image,
+          url: agentData.agent_image,
         },
       ]);
       form.setFieldsValue({
-        category_name: categoryData.category_name || "",
-        category_image: [
+        agent_name: agentData.agent_name || "",
+        agent_image: [
           {
             uid: "-1",
             name: "Current Image",
             status: "done",
-            url: categoryData.category_image,
+            url: agentData.agent_image,
           },
         ],
       });
     } else {
       setFileList([]);
       form.setFieldsValue({
-        category_name: categoryData?.category_name || "",
-        category_image: [],
+        agent_name: agentData?.agent_name || "",
+        agent_image: [],
       });
     }
-  }, [categoryData, form]);
+  }, [agentData, form]);
 
   // Handle form submission
   const onSubmit = async (values) => {
     setLoading(true);
     const formData = new FormData();
 
-    formData.append("category_name", values.category_name);
+    formData.append("agent_name", values.agent_name);
 
     if (
-      values.category_image &&
-      values.category_image[0] &&
-      values.category_image[0].originFileObj
+      values.agent_image &&
+      values.agent_image[0] &&
+      values.agent_image[0].originFileObj
     ) {
-      formData.append("category_image", values.category_image[0].originFileObj);
+      formData.append("agent_image", values.agent_image[0].originFileObj);
     }
 
     try {
-      const response = await API.put(`/category/${categoryData?.id}`, formData);
+      const response = await API.put(`/agent/${agentData?.id}`, formData);
       if (response.status === 200) {
-        message.success(`${values.category_name} updated successfully!`);
+        message.success(`${values.agent_name} updated successfully!`);
       }
       refetch();
       onClose();
     } catch (error) {
-      message.error(`Failed to add ${values.category_name}. Try again.`);
+      message.error(`Failed to add ${values.agent_name}. Try again.`);
       console.log("error", error);
     } finally {
       setLoading(false);
@@ -72,9 +72,7 @@ function EditCategory({ categoryData, isOpen, onClose, refetch }) {
 
   return (
     <Modal
-      title={
-        <Title level={3}>{categoryData?.category_name} Edit - Category</Title>
-      }
+      title={<Title level={3}>{agentData?.agent_name} Edit - Agent</Title>}
       open={isOpen}
       onCancel={onClose}
       footer={null}
@@ -85,11 +83,11 @@ function EditCategory({ categoryData, isOpen, onClose, refetch }) {
         form={form}
         onFinish={onSubmit}
         initialValues={{
-          category_name: categoryData?.category_name || "",
+          agent_name: agentData?.agent_name || "",
         }}
       >
         {/* Image Upload */}
-        <Form.Item label="Upload Image" name="category_image">
+        <Form.Item label="Upload Image" name="agent_image">
           <Upload
             listType="picture-card"
             beforeUpload={() => false}
@@ -99,15 +97,15 @@ function EditCategory({ categoryData, isOpen, onClose, refetch }) {
             onChange={({ fileList: newFileList }) => {
               if (newFileList.length > 0 && newFileList[0].originFileObj) {
                 setFileList([newFileList[0]]);
-                form.setFieldsValue({ category_image: [newFileList[0]] });
+                form.setFieldsValue({ agent_image: [newFileList[0]] });
               } else {
                 setFileList(newFileList);
-                form.setFieldsValue({ category_image: newFileList });
+                form.setFieldsValue({ agent_image: newFileList });
               }
             }}
             onRemove={() => {
               setFileList([]);
-              form.setFieldsValue({ category_image: [] });
+              form.setFieldsValue({ agent_image: [] });
             }}
             onPreview={(file) => {
               const src = file.url || URL.createObjectURL(file.originFileObj);
@@ -124,13 +122,13 @@ function EditCategory({ categoryData, isOpen, onClose, refetch }) {
           </Upload>
         </Form.Item>
 
-        {/* Category Name */}
+        {/* Agent Name */}
         <Form.Item
-          label="Category Name"
-          name="category_name"
-          rules={[{ required: true, message: "Category name is required" }]}
+          label="Agent Name"
+          name="agent_name"
+          rules={[{ required: true, message: "Agent name is required" }]}
         >
-          <Input placeholder="Enter Category name..." />
+          <Input placeholder="Enter Agent name..." />
         </Form.Item>
 
         <Form.Item>
@@ -149,4 +147,4 @@ function EditCategory({ categoryData, isOpen, onClose, refetch }) {
   );
 }
 
-export default EditCategory;
+export default EditAgent;

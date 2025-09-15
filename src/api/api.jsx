@@ -34,15 +34,8 @@ export const useAdminProfile = () => {
   return { admin, isLoading, isError, error, refetch };
 };
 
-
-
-
-
-
 // Get all Categories
-export const useGetAllCategories = ({ status  } = {}) => {
-
-
+export const useGetAllCategories = ({ status } = {}) => {
   const getData = async () => {
     const response = await API.get("/category/all", {
       params: { status },
@@ -67,43 +60,39 @@ export const useGetAllCategories = ({ status  } = {}) => {
   return { allCategories, isLoading, isError, error, refetch };
 };
 
+// Get all Agents
+export const useGetAllAgents = ({ status } = {}) => {
+  const getData = async () => {
+    const response = await API.get("/agent/all", {
+      params: { status },
+    });
+    return response.data;
+  };
 
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allAgents", status],
+    queryFn: getData,
+    keepPreviousData: true,
+  });
 
+  const { data: allAgents = [] } = response;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  return { allAgents, isLoading, isError, error, refetch };
+};
 
 // Get all products
-export const useGetAllProducts = ({ page = 1, limit = 10, status, product_name  } = {}) => {
+export const useGetAllProducts = ({
+  page = 1,
+  limit = 10,
+  status,
+  product_name,
+} = {}) => {
   const getData = async () => {
     const response = await API.get("/product/all", {
       params: { page, limit, status, product_name },
