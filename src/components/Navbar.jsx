@@ -84,47 +84,20 @@ const Navbar = ({ showDrawer }) => {
             </Link>
           </div>
 
-          {/* Right section */}
-          <div className="flex items-center gap-4 lg:gap-8">
-            <Badge
-              count={10}
-              size="small"
-              className="cursor-pointer p-2 rounded-full border border-gray-400 bg-white hover:text-blue-500 transition-colors"
-            >
-              <BellOutlined
-                className="text-2xl"
-                onClick={() => setDrawerVisible(true)}
-              />
-            </Badge>
-
-            <Dropdown
-              menu={{ items: profileMenuItems }}
-              trigger={["click"]}
-              placement="bottomRight"
-              overlayClassName="w-64"
-            >
-              <Avatar
-                icon={<UserOutlined className="" />}
-                size="large"
-                className="cursor-pointer border border-white hover:opacity-80 transition-opacity"
-              />
-            </Dropdown>
-          </div>
+          <Dropdown
+            menu={{ items: profileMenuItems }}
+            trigger={["click"]}
+            placement="bottomRight"
+            overlayClassName="w-64"
+          >
+            <Avatar
+              icon={<UserOutlined className="" />}
+              size="large"
+              className="cursor-pointer border border-white hover:opacity-80 transition-opacity"
+            />
+          </Dropdown>
         </div>
       </div>
-
-      <Drawer
-        title="Notifications"
-        placement="right"
-        onClose={() => setDrawerVisible(false)}
-        open={drawerVisible}
-        width={300}
-        bodyStyle={{ padding: 0 }}
-      >
-        <div className="p-4">
-          <p>No new notifications</p>
-        </div>
-      </Drawer>
     </header>
   );
 };

@@ -108,6 +108,36 @@ function Agents() {
     },
 
     {
+      title: <span>Yuan Rate</span>,
+      dataIndex: "yuan_rate",
+      key: "yuan_rate",
+      render: (yuan_rate) => <span>¥ {yuan_rate}</span>,
+    },
+    {
+      title: <span>USD Rate</span>,
+      dataIndex: "usd_rate",
+      key: "usd_rate",
+      render: (usd_rate) => <span>$ {usd_rate}</span>,
+    },
+    {
+      title: <span>EURO Rate</span>,
+      dataIndex: "euro_rate",
+      key: "euro_rate",
+      render: (euro_rate) => <span>€ {euro_rate}</span>,
+    },
+    {
+      title: <span>AUD Rate</span>,
+      dataIndex: "aud_rate",
+      key: "aud_rate",
+      render: (aud_rate) => <span>A$ {aud_rate}</span>,
+    },
+    {
+      title: <span>CAD Rate</span>,
+      dataIndex: "cad_rate",
+      key: "cad_rate",
+      render: (cad_rate) => <span>C$ {cad_rate}</span>,
+    },
+    {
       title: <span>Status</span>,
       dataIndex: "status",
       key: "status",
@@ -119,7 +149,7 @@ function Agents() {
             <Tag color="red">{status}</Tag>
           )}
           <Button
-          className="-ml-1"
+            className="-ml-1"
             title="Status Change"
             size="small"
             icon={<EditOutlined />}

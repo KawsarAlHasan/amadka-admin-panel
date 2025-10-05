@@ -19,7 +19,6 @@ function Categories() {
   const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [newStatus, setNewStatus] = useState("");
-
   const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
 
   if (isLoading) {

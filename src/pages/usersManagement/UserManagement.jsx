@@ -1,5 +1,15 @@
 import React, { useState } from "react";
-import { Table, Tag, Space, Avatar, Modal, notification } from "antd";
+import {
+  Table,
+  Tag,
+  Space,
+  Avatar,
+  Modal,
+  notification,
+  Button,
+  Select,
+  message,
+} from "antd";
 import { MdBlock } from "react-icons/md";
 import { useAllUsers } from "../../services/userService";
 import IsError from "../../components/IsError";
@@ -8,8 +18,10 @@ import {
   EyeOutlined,
   ReloadOutlined,
   ExclamationCircleOutlined,
+  EditOutlined,
 } from "@ant-design/icons";
 import ViewAnswerModal from "./ViewAnswerModal";
+import { useGetAllUsers } from "../../api/api";
 // import UserDetailsModal from "./UserDetailsModal";
 
 const { confirm } = Modal;
@@ -20,12 +32,16 @@ function UserManagement() {
     limit: 10,
   });
 
-  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
-  const [userDetailsData, setUserDetailsData] = useState(null);
+  // Status change modal states
+  const [isStatusModalOpen, setIsStatusModalOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [newStatus, setNewStatus] = useState("");
+  const [isStatusChangeLoading, setIsStatusChangeLoading] = useState(false);
+
   const [blockLoading, setBlockLoading] = useState(false);
 
   const { allUsers, pagination, isLoading, isError, error, refetch } =
-    useAllUsers(filter);
+    useGetAllUsers(filter);
 
   const openNotification = (type, message, description) => {
     notification[type]({
@@ -64,16 +80,6 @@ function UserManagement() {
     }
   };
 
-  const handleUserDetails = (userData) => {
-    setUserDetailsData(userData);
-    setIsViewModalOpen(true);
-  };
-
-  const handleModalClose = () => {
-    setUserDetailsData(null);
-    setIsViewModalOpen(false);
-  };
-
   const handleTableChange = (pagination, filters, sorter) => {
     setFilter((prev) => ({
       ...prev,
@@ -82,20 +88,53 @@ function UserManagement() {
     }));
   };
 
+  // Status change modal open
+  const openStatusModal = (record) => {
+    setSelectedCategory(record);
+    setNewStatus(record.status); // default current status
+    setIsStatusModalOpen(true);
+  };
+
+  // Status update API call
+  const handleStatusChange = async () => {
+    if (!selectedCategory) return;
+
+    setIsStatusChangeLoading(true);
+
+    try {
+      // await API.patch(`/user/${selectedCategory.id}`, {
+      //   status: newStatus,
+      // });
+      message.success("User status updated successfully!");
+      setIsStatusModalOpen(false);
+      setSelectedCategory(null);
+      setNewStatus("");
+      refetch();
+    } catch (err) {
+      message.error(
+        err.response?.data?.error || "Failed to update user status"
+      );
+    } finally {
+      setIsStatusChangeLoading(false);
+    }
+  };
+
   const columns = [
     {
       title: <span>Sl no.</span>,
-      dataIndex: "serial_number",
-      key: "serial_number",
-      render: (serial) => <span>#{serial}</span>,
+      dataIndex: "id",
+      key: "id",
+      render: (_, __, index) => {
+        return <span>#{(filter.page - 1) * filter.limit + (index + 1)}</span>;
+      },
     },
     {
       title: <span>User</span>,
-      dataIndex: "full_name",
-      key: "full_name",
+      dataIndex: "name",
+      key: "name",
       render: (text, record) => (
         <Space size="middle">
-          <Avatar className="w-[40px] h-[40px]" src={record.profile} />
+          <Avatar className="w-[40px] h-[40px]" src={record.profilePic} />
           <span>{text}</span>
         </Space>
       ),
@@ -110,40 +149,55 @@ function UserManagement() {
       title: <span>Phone</span>,
       dataIndex: "phone",
       key: "phone",
-      render: (phone) => <span>{phone}</span>,
+      render: (phone) => <span>{phone || "N/A"}</span>,
     },
     {
       title: <span>Currency</span>,
       dataIndex: "currency",
       key: "currency",
-      render: (currency) => <span>{currency}</span>,
+      render: (currency) => <span>{currency || "N/A"}</span>,
     },
     {
       title: <span>Agents</span>,
-      dataIndex: "agents",
-      key: "agents",
-      render: (agents) => <span>{agents}</span>,
+      dataIndex: "agent",
+      key: "agent",
+      render: (agent) => (
+        <>
+          {" "}
+          {agent?.agent_name ? (
+            <Space size="middle">
+              <Avatar className="w-[30px] h-[30px]" src={agent?.agent_image} />
+              <span>{agent?.agent_name}</span>
+            </Space>
+          ) : (
+            "N/A"
+          )}{" "}
+        </>
+      ),
     },
-    // {
-    //   title: <span>Answers</span>,
-    //   dataIndex: "question_answer",
-    //   key: "question_answer",
-    //   render: (question_answer) => (
-    //     <ViewAnswerModal question_answer={question_answer} />
-    //   ),
-    // },
-    // {
-    //   title: <span>Status</span>,
-    //   key: "status",
-    //   render: () => (
-    //     <Tag
-    //       className="w-full mr-5 text-center text-[20px] py-3"
-    //       color="#359700"
-    //     >
-    //       Active
-    //     </Tag>
-    //   ),
-    // },
+
+    {
+      title: <span>Status</span>,
+      dataIndex: "status",
+      key: "status",
+      render: (status, record) => (
+        <div className="flex items-center ">
+          {status === "Active" ? (
+            <Tag color="green">Active</Tag>
+          ) : (
+            <Tag color="red">{status}</Tag>
+          )}
+          <Button
+            className="-ml-1"
+            title="Status Change"
+            size="small"
+            icon={<EditOutlined />}
+            onClick={() => openStatusModal(record)}
+          />
+        </div>
+      ),
+    },
+
     {
       title: <span>Action</span>,
       key: "action",
@@ -185,15 +239,27 @@ function UserManagement() {
         }}
         onChange={handleTableChange}
         loading={isLoading}
-        // className="custom-dark-table"
-        // rowClassName={() => "dark-table-row"}
       />
 
-      {/* <UserDetailsModal
-        userDetailsData={userDetailsData}
-        isOpen={isViewModalOpen}
-        onClose={handleModalClose}
-      /> */}
+      {/* Status Change Modal */}
+      <Modal
+        title="Change User Status"
+        open={isStatusModalOpen}
+        onOk={handleStatusChange}
+        onCancel={() => setIsStatusModalOpen(false)}
+        okText="Update"
+        confirmLoading={isStatusChangeLoading}
+      >
+        <p className="mb-2">Select new status for this User:</p>
+        <Select
+          value={newStatus}
+          onChange={(value) => setNewStatus(value)}
+          style={{ width: "100%" }}
+        >
+          <Select.Option value="Active">Active</Select.Option>
+          <Select.Option value="Deactive">Deactive</Select.Option>
+        </Select>
+      </Modal>
     </div>
   );
 }

@@ -3,7 +3,6 @@ import { Form, Input, Button, Checkbox, message } from "antd";
 import { Link } from "react-router-dom";
 import logo from "../../assets/logo.png";
 import { API } from "../../api/api";
-// import { API } from "../../api/api";
 
 const Login = () => {
   const [loading, setLoading] = useState(false); // Loading state for login button
@@ -16,18 +15,17 @@ const Login = () => {
         password: values.password,
       });
 
-      // // If successful, save the token in localStorage
+      // If successful, save the token in localStorage
       localStorage.setItem("token", response.data.accesstoken);
 
       // Show success message
-      message.success("Login successful!");
-
-      // Redirect to the admin dashboard (replace with your route)
-      window.location.href = "/";
+      message.success("Login successful!", 1).then(() => {
+        window.location.href = "/";
+      });
     } catch (error) {
       // Show error message
       message.error(
-        error.response?.data?.error || "Login failed. Please try again."
+        error.response?.data?.message || "Login failed. Please try again."
       );
     } finally {
       setLoading(false); // Stop loading after request

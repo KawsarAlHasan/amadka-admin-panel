@@ -60,6 +60,32 @@ export const useGetAllCategories = ({ status } = {}) => {
   return { allCategories, isLoading, isError, error, refetch };
 };
 
+// Get Dashboard
+export const useGetDashboard = ({ status } = {}) => {
+  const getData = async () => {
+    const response = await API.get("/settings/dashboard", {
+      params: { status },
+    });
+    return response.data;
+  };
+
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["getDashboard", status],
+    queryFn: getData,
+    keepPreviousData: true,
+  });
+
+  const { data: getDashboard = [] } = response;
+
+  return { getDashboard, isLoading, isError, error, refetch };
+};
+
 // Get all Agents
 export const useGetAllAgents = ({ status } = {}) => {
   const getData = async () => {
@@ -68,7 +94,7 @@ export const useGetAllAgents = ({ status } = {}) => {
     });
     return response.data;
   };
-
+ 
   const {
     data: response = {},
     isLoading,
@@ -84,6 +110,38 @@ export const useGetAllAgents = ({ status } = {}) => {
   const { data: allAgents = [] } = response;
 
   return { allAgents, isLoading, isError, error, refetch };
+};
+
+// Get all Users
+export const useGetAllUsers = ({
+  page = 1,
+  limit = 10,
+  status,
+  email,
+  agent,
+} = {}) => {
+  const getData = async () => {
+    const response = await API.get("/user/all", {
+      params: { page, limit, status, agent, email },
+    });
+    return response.data;
+  };
+
+  const {
+    data: response = {},
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
+    queryKey: ["allUsers", page, limit, status, agent, email],
+    queryFn: getData,
+    keepPreviousData: true,
+  });
+
+  const { data: allUsers = [], pagination = {} } = response;
+
+  return { allUsers, pagination, isLoading, isError, error, refetch };
 };
 
 // Get all products

@@ -3,7 +3,7 @@ import { Form, Input, Button, Checkbox, message } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.png";
 
-// import { API } from "../../api/api";
+import { API } from "../../api/api";
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -12,22 +12,19 @@ const ForgotPassword = () => {
   const onFinish = async (values) => {
     setLoading(true); // Start loading when submitting form
     try {
-      // const response = await API.post("/admin/login", {
-      //   email: values.email,
-      // });
+       const response = await API.post("/admin-forgot-password/send-reset-code", values);
 
-      // // If successful, save the token in localStorage
-      // localStorage.setItem("token", response.data.data.token);
-
-      // Show success message
-      message.success("Send code on your email successful!");
-
-      navigate("/check-code");
+      if (response.status === 200) {
+        localStorage.setItem("email", values.email);
+        message.success("Email sent successfully! Please check your email.");
+        navigate("/check-code");
+      }
+     
     } catch (error) {
-      // Show error message
       message.error(
-        "Send code on your email failed. Please try again." // error.response?.data?.message
+        error?.response?.data?.message || "Forgot password failed."
       );
+      console.error("Forgot password error:", error);
     } finally {
       setLoading(false); // Stop loading after request
     }

@@ -7,8 +7,10 @@ import {
 } from "@ant-design/icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { FaUsers } from "react-icons/fa";
-import { MdOutlinePayment, MdLeaderboard } from "react-icons/md";
+import { MdOutlinePayment, MdLeaderboard, MdOutlineCategory } from "react-icons/md";
 import { FaBuildingFlag } from "react-icons/fa6";
+import { RiProductHuntLine } from "react-icons/ri";
+
 import { SlBadge } from "react-icons/sl";
 
 // import { signOutAdmin } from "../api/api";
@@ -47,19 +49,19 @@ const Sidebar = ({ onClick }) => {
       icon: <FaUsers />,
       label: <Link to="/user-management">User Management</Link>,
     },
-    {
-      key: "3",
-      icon: <FaBuildingFlag />,
-      label: <Link to="/administrators">Administrators</Link>,
-    },
+    // {
+    //   key: "3",
+    //   icon: <FaBuildingFlag />,
+    //   label: <Link to="/administrators">Administrators</Link>,
+    // },
     {
       key: "products",
-      icon: <FaBuildingFlag />,
+      icon: <RiProductHuntLine />,
       label: <Link to="/products">Products</Link>,
     },
     {
       key: "categories",
-      icon: <FaBuildingFlag />,
+      icon: <MdOutlineCategory />,
       label: <Link to="/categories">Categories</Link>,
     },
     {

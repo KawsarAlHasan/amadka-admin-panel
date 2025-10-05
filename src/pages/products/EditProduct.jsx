@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   Modal,
@@ -13,13 +13,13 @@ import {
   Card,
   Tag,
 } from "antd";
-import { UploadOutlined, DeleteOutlined } from "@ant-design/icons";
+import { UploadOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { API, useGetAllAgents, useGetAllCategories } from "../../api/api";
 
 const { TextArea } = Input;
 const { Option } = Select;
 
-const AddNewProduct = ({ refetch }) => {
+const EditProduct = ({ refetch, product }) => {
   const { allAgents } = useGetAllAgents({
     status: "Active",
   });
@@ -27,7 +27,6 @@ const AddNewProduct = ({ refetch }) => {
   const { allCategories } = useGetAllCategories({ status: "Active" });
 
   const [loading, setLoading] = useState(false);
-
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [form] = Form.useForm();
   const [imageList, setImageList] = useState([]);
@@ -35,6 +34,45 @@ const AddNewProduct = ({ refetch }) => {
   const [colors, setColors] = useState([]);
   const [selectedAgents, setSelectedAgents] = useState([]);
   const [affiliateLinks, setAffiliateLinks] = useState({});
+
+  // Populate form with existing product data when product prop changes
+  useEffect(() => {
+    if (product && isModalOpen) {
+      // Set basic form fields
+      form.setFieldsValue({
+        product_name: product.product_name,
+        description: product.description,
+        price: product.price,
+        offer_price: product.offer_price,
+        categoryId: product.categoryId,
+      });
+
+      // Set sizes and colors
+      setSizes(product.sizes || []);
+      setColors(product.colors || []);
+
+      // Set affiliates data
+      const agentIds = product.affiliates?.map(affiliate => affiliate.agentId) || [];
+      setSelectedAgents(agentIds);
+
+      // Set affiliate links
+      const links = {};
+      product.affiliates?.forEach(affiliate => {
+        links[affiliate.agentId] = affiliate.affiliate_link;
+      });
+      setAffiliateLinks(links);
+
+      // Set existing images for display (read-only)
+      const existingImages = product.images?.map((image, index) => ({
+        uid: `existing-${index}`,
+        name: `image-${index}.jpg`,
+        status: 'done',
+        url: image,
+        thumbUrl: image,
+      })) || [];
+      setImageList(existingImages);
+    }
+  }, [product, isModalOpen, form]);
 
   const showModal = () => {
     setIsModalOpen(true);
@@ -71,18 +109,24 @@ const AddNewProduct = ({ refetch }) => {
       }));
       formData.append("affiliates", JSON.stringify(affiliates));
 
-      // Add image files
-      imageList.forEach((file) => {
+      // Add only new image files (exclude existing URLs)
+      const newImageFiles = imageList.filter(file => file.originFileObj);
+      newImageFiles.forEach((file) => {
         if (file.originFileObj) {
           formData.append("images", file.originFileObj);
         }
       });
 
+      // If no new images but existing images, keep the existing ones
+      if (newImageFiles.length === 0 && product.images && product.images.length > 0) {
+        formData.append("existing_images", JSON.stringify(product.images));
+      }
+
       // API call
-      const response = await API.post("/product/create", formData);
+      const response = await API.put(`/product/update/${product.id}`, formData);
 
       if (response.data.success) {
-        message.success("Product created successfully!");
+        message.success("Product Updated successfully!");
         setIsModalOpen(false);
         form.resetFields();
         setImageList([]);
@@ -94,7 +138,7 @@ const AddNewProduct = ({ refetch }) => {
       }
     } catch (error) {
       message.error(
-        error.response.data.message || "Please fill in all the required fields."
+        error.response?.data?.message || "Please fill in all the required fields."
       );
     } finally {
       setLoading(false);
@@ -140,6 +184,7 @@ const AddNewProduct = ({ refetch }) => {
     listType: "picture",
     onChange: handleImageUpload,
     multiple: true,
+    fileList: imageList,
   };
 
   const getAgentName = (agentId) => {
@@ -152,25 +197,30 @@ const AddNewProduct = ({ refetch }) => {
     return agent ? agent.agent_image : null;
   };
 
+  // Function to handle image removal
+  const handleImageRemove = (file) => {
+    const newImageList = imageList.filter(item => item.uid !== file.uid);
+    setImageList(newImageList);
+  };
+
   return (
     <>
       <Button
-        type="primary"
         onClick={showModal}
-        className="upload-button custom-primary-btn"
-      >
-        + Single Product Upload
-      </Button>
+        type="primary"
+        className="custom-primary-btn"
+        icon={<EditOutlined />}
+      />
+
       <Modal
-        title="Upload New Product"
+        title="Edit Product"
         open={isModalOpen}
         footer={null}
         onCancel={handleCancel}
         width={800}
-        okText="Upload Product"
+        okText="Update Product"
         cancelText="Cancel"
         className="luxury-modal"
-        maskClosable={false}
         centered
       >
         <Form
@@ -269,12 +319,22 @@ const AddNewProduct = ({ refetch }) => {
           <Form.Item
             label="Product Images"
             rules={[
-              { required: true, message: "Please upload at least one image!" },
+              { 
+                required: imageList.length === 0, 
+                message: "Please upload at least one image!" 
+              },
             ]}
           >
-            <Upload {...uploadProps} fileList={imageList}>
+            <Upload 
+              {...uploadProps} 
+              fileList={imageList}
+              onRemove={handleImageRemove}
+            >
               <Button icon={<UploadOutlined />}>Upload Images</Button>
             </Upload>
+            <div style={{ marginTop: 8, fontSize: 12, color: '#999' }}>
+              Existing images will be kept unless removed. Upload new images to add more.
+            </div>
           </Form.Item>
 
           <Divider orientation="left">Affiliate Information</Divider>
@@ -282,7 +342,10 @@ const AddNewProduct = ({ refetch }) => {
           <Form.Item
             label="Select Agents"
             rules={[
-              { required: true, message: "Please select at least one agent!" },
+              { 
+                required: selectedAgents.length === 0, 
+                message: "Please select at least one agent!" 
+              },
             ]}
           >
             <Select
@@ -316,16 +379,8 @@ const AddNewProduct = ({ refetch }) => {
               {selectedAgents.map((agentId) => (
                 <Form.Item
                   key={agentId}
-                  name={`affiliate_${agentId}`} // unique field name
-                  rules={[
-                    {
-                      required: true,
-                      message: "Affiliate link is required for this agent!",
-                    },
-                  ]}
-                >
-                  <div className="mb-3 p-2 border rounded">
-                    <div className="flex justify-between items-center mb-2">
+                  label={
+                    <div className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <Avatar src={getAgentImage(agentId)} size="small" />
                         <span className="font-medium">
@@ -340,14 +395,15 @@ const AddNewProduct = ({ refetch }) => {
                         onClick={() => removeAgent(agentId)}
                       />
                     </div>
-                    <Input
-                      placeholder="Enter affiliate link for this agent"
-                      value={affiliateLinks[agentId] || ""}
-                      onChange={(e) =>
-                        handleAffiliateLinkChange(agentId, e.target.value)
-                      }
-                    />
-                  </div>
+                  }
+                >
+                  <Input
+                    placeholder="Enter affiliate link for this agent"
+                    value={affiliateLinks[agentId] || ""}
+                    onChange={(e) =>
+                      handleAffiliateLinkChange(agentId, e.target.value)
+                    }
+                  />
                 </Form.Item>
               ))}
             </Card>
@@ -367,11 +423,13 @@ const AddNewProduct = ({ refetch }) => {
 
           <Divider orientation="left">Variants</Divider>
 
-          <Form.Item label="Available Sizes" name="sizes">
+          <Form.Item label="Available Sizes">
             <Select
               mode="tags"
               style={{ width: "100%" }}
               placeholder="Select or add sizes"
+              value={sizes}
+              onChange={setSizes}
               options={[
                 { value: "XS", label: "XS" },
                 { value: "S", label: "S" },
@@ -379,22 +437,22 @@ const AddNewProduct = ({ refetch }) => {
                 { value: "L", label: "L" },
                 { value: "XL", label: "XL" },
               ]}
-              onChange={setSizes}
             />
           </Form.Item>
 
-          <Form.Item label="Available Colors" name="colors">
+          <Form.Item label="Available Colors">
             <Select
               mode="tags"
               style={{ width: "100%" }}
               placeholder="Select or add colors"
+              value={colors}
+              onChange={setColors}
               options={[
                 { value: "Red", label: "Red" },
                 { value: "Blue", label: "Blue" },
                 { value: "Black", label: "Black" },
                 { value: "White", label: "White" },
               ]}
-              onChange={setColors}
             />
           </Form.Item>
 
@@ -405,7 +463,7 @@ const AddNewProduct = ({ refetch }) => {
             className="custom-primary-btn"
             htmlType="submit"
           >
-            Submit
+            Update Product
           </Button>
         </Form>
       </Modal>
@@ -413,4 +471,4 @@ const AddNewProduct = ({ refetch }) => {
   );
 };
 
-export default AddNewProduct;
+export default EditProduct;

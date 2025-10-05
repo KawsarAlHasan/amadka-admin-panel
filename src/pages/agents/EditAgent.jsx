@@ -1,5 +1,14 @@
 import React, { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Upload, message, Typography } from "antd";
+import {
+  Button,
+  Modal,
+  Form,
+  Input,
+  Upload,
+  message,
+  Typography,
+  InputNumber,
+} from "antd";
 import { UploadOutlined } from "@ant-design/icons";
 import { API } from "../../api/api";
 
@@ -47,6 +56,21 @@ function EditAgent({ agentData, isOpen, onClose, refetch }) {
 
     formData.append("agent_name", values.agent_name);
 
+    if (values.usd_rate) {
+      formData.append("usd_rate", values.usd_rate);
+    }
+
+    if (values.euro_rate) {
+      formData.append("euro_rate", values.euro_rate);
+    }
+
+    if (values.aud_rate) {
+      formData.append("aud_rate", values.aud_rate);
+    }
+    if (values.cad_rate) {
+      formData.append("cad_rate", values.cad_rate);
+    }
+
     if (
       values.agent_image &&
       values.agent_image[0] &&
@@ -84,6 +108,10 @@ function EditAgent({ agentData, isOpen, onClose, refetch }) {
         onFinish={onSubmit}
         initialValues={{
           agent_name: agentData?.agent_name || "",
+          usd_rate: agentData?.usd_rate || 0,
+          euro_rate: agentData?.euro_rate || 0,
+          aud_rate: agentData?.aud_rate || 0,
+          cad_rate: agentData?.cad_rate || 0,
         }}
       >
         {/* Image Upload */}
@@ -130,6 +158,24 @@ function EditAgent({ agentData, isOpen, onClose, refetch }) {
         >
           <Input placeholder="Enter Agent name..." />
         </Form.Item>
+
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <Form.Item label="USD Rate" name="usd_rate">
+            <InputNumber placeholder="Enter USD rate..." />
+          </Form.Item>
+
+          <Form.Item label="Euro Rate" name="euro_rate">
+            <InputNumber placeholder="Enter euro rate..." />
+          </Form.Item>
+
+          <Form.Item label="AUD Rate" name="aud_rate">
+            <InputNumber placeholder="Enter AUD rate..." />
+          </Form.Item>
+
+          <Form.Item label="CAD Rate" name="cad_rate">
+            <InputNumber placeholder="Enter CAD rate..." />
+          </Form.Item>
+        </div>
 
         <Form.Item>
           <Button
