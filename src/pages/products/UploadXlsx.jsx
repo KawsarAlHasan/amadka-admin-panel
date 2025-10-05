@@ -1,12 +1,24 @@
 import React, { useState } from "react";
-import { Button, Modal, Upload, message, Progress, Space, Typography } from "antd";
-import { CloudUploadOutlined, InboxOutlined, FileExcelOutlined } from "@ant-design/icons";
+import {
+  Button,
+  Modal,
+  Upload,
+  message,
+  Progress,
+  Space,
+  Typography,
+} from "antd";
+import {
+  CloudUploadOutlined,
+  InboxOutlined,
+  FileExcelOutlined,
+} from "@ant-design/icons";
 import { API } from "../../api/api";
 
 const { Dragger } = Upload;
 const { Text } = Typography;
 
-function UploadXlsx({refetch}) {
+function UploadXlsx({ refetch }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -36,7 +48,7 @@ function UploadXlsx({refetch}) {
 
       // Simulate progress for better UX
       const progressInterval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 90) {
             clearInterval(progressInterval);
             return 90;
@@ -59,55 +71,56 @@ function UploadXlsx({refetch}) {
         },
       });
 
-      console.log("Upload response:", response.data);
-
       clearInterval(progressInterval);
       setUploadProgress(100);
-      
+
       onSuccess(response.data, file);
       message.success(`${file.name} file uploaded successfully!`);
-      
+
       // Close modal after successful upload
       setTimeout(() => {
         setUploading(false);
         setIsModalOpen(false);
         setFileList([]);
         setUploadProgress(0);
-        // window.location.reload();
+        refetch();
       }, 1000);
-
     } catch (error) {
       setUploading(false);
       setUploadProgress(0);
       onError(error);
-      message.error(  error.response.data.message || `${file.name} file upload failed.`);
-      console.error("Upload error:", error);
+      message.error(
+        error.response.data.message || `${file.name} file upload failed.`
+      );
+      message.error(error?.message || "Upload failed. Please try again.");
     }
   };
 
   const uploadProps = {
-    name: 'file',
+    name: "file",
     multiple: false,
-    accept: '.xlsx,.xls,.csv',
+    accept: ".xlsx,.xls,.csv",
     fileList: fileList,
     customRequest: customRequest,
     beforeUpload: (file) => {
       // Validate file type
-      const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' ||
-                     file.type === 'application/vnd.ms-excel' ||
-                     file.name.endsWith('.xlsx') ||
-                     file.name.endsWith('.xls') ||
-                     file.name.endsWith('.csv');
-      
+      const isExcel =
+        file.type ===
+          "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
+        file.type === "application/vnd.ms-excel" ||
+        file.name.endsWith(".xlsx") ||
+        file.name.endsWith(".xls") ||
+        file.name.endsWith(".csv");
+
       if (!isExcel) {
-        message.error('You can only upload Excel/CSV files!');
+        message.error("You can only upload Excel/CSV files!");
         return false;
       }
 
-      // Validate file size (5MB max)
-      const isLt5M = file.size / 1024 / 1024 < 5;
+      // Validate file size (1GB max)
+      const isLt5M = file.size / 1024 / 1024 < 1024;
       if (!isLt5M) {
-        message.error('File must be smaller than 5MB!');
+        message.error("File must be smaller than 1GB!");
         return false;
       }
 
@@ -117,15 +130,15 @@ function UploadXlsx({refetch}) {
     },
     onChange(info) {
       const { status } = info.file;
-      
-      if (status === 'done') {
-        console.log('Upload completed:', info.file.name);
-      } else if (status === 'error') {
-        console.error('Upload failed:', info.file.name);
+
+      if (status === "done") {
+        message.success(`${info.file.name} file uploaded successfully!`);
+      } else if (status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
       }
     },
     onDrop(e) {
-      console.log('Dropped files', e.dataTransfer.files);
+      message.error("You can only upload one file at a time.");
     },
     onRemove: () => {
       setFileList([]);
@@ -135,7 +148,7 @@ function UploadXlsx({refetch}) {
 
   const handleUpload = () => {
     if (fileList.length === 0) {
-      message.warning('Please select a file first!');
+      message.warning("Please select a file first!");
       return;
     }
 
@@ -159,11 +172,11 @@ function UploadXlsx({refetch}) {
       >
         Upload Xlsx
       </Button>
-      
+
       <Modal
         title={
           <Space>
-            <FileExcelOutlined style={{ color: '#1890ff' }} />
+            <FileExcelOutlined style={{ color: "#1890ff" }} />
             Upload Products Excel File
           </Space>
         }
@@ -181,14 +194,14 @@ function UploadXlsx({refetch}) {
             disabled={fileList.length === 0 || uploading}
             icon={<CloudUploadOutlined />}
           >
-            {uploading ? 'Uploading...' : 'Start Upload'}
+            {uploading ? "Uploading..." : "Start Upload"}
           </Button>,
         ]}
         width={600}
         closable={!uploading}
         maskClosable={!uploading}
       >
-        <Space direction="vertical" style={{ width: '100%' }} size="large">
+        <Space direction="vertical" style={{ width: "100%" }} size="large">
           <Dragger {...uploadProps}>
             <p className="ant-upload-drag-icon">
               <InboxOutlined />
@@ -197,7 +210,7 @@ function UploadXlsx({refetch}) {
               Click or drag Excel file to this area to upload
             </p>
             <p className="ant-upload-hint">
-              Support for .xlsx, .xls, .csv files. Maximum file size: 5MB
+              Support for .xlsx, .xls, .csv files. Maximum file size: 1GB
             </p>
           </Dragger>
 
@@ -205,7 +218,8 @@ function UploadXlsx({refetch}) {
             <div>
               <Text strong>Selected File:</Text>
               <Text type="secondary" style={{ marginLeft: 8 }}>
-                {fileList[0].name} ({(fileList[0].size / 1024 / 1024).toFixed(2)} MB)
+                {fileList[0].name} (
+                {(fileList[0].size / 1024 / 1024).toFixed(2)} MB)
               </Text>
             </div>
           )}
@@ -213,9 +227,9 @@ function UploadXlsx({refetch}) {
           {uploading && (
             <div>
               <Text strong>Upload Progress:</Text>
-              <Progress 
-                percent={uploadProgress} 
-                status={uploadProgress === 100 ? 'success' : 'active'}
+              <Progress
+                percent={uploadProgress}
+                status={uploadProgress === 100 ? "success" : "active"}
                 style={{ marginTop: 8 }}
               />
             </div>

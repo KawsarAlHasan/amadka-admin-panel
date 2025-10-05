@@ -1,15 +1,9 @@
 import { Button, Input, Space, Table, Tag, Image, Modal, message } from "antd";
-import {
-  EditOutlined,
-  DeleteOutlined,
-  EyeOutlined,
-  ReloadOutlined,
-} from "@ant-design/icons";
+import { DeleteOutlined, EyeOutlined, ReloadOutlined } from "@ant-design/icons";
 import { useState } from "react";
 import AddNewProduct from "./AddNewProduct";
-import { useGetAllProducts } from "../../api/api";
+import { API, useGetAllProducts } from "../../api/api";
 import IsError from "../../components/IsError";
-import { LuSend } from "react-icons/lu";
 import ViewProduct from "./ViewProduct";
 import EditProduct from "./EditProduct";
 import UploadXlsx from "./UploadXlsx";
@@ -19,7 +13,6 @@ const { Search } = Input;
 function Products() {
   const [selectedFood, setSelectedProduct] = useState(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [searchText, setSearchText] = useState("");
   const [deleteLoading, setDeleteLoading] = useState(false);
 
   const [searchValue, setSearchValue] = useState("");
@@ -72,7 +65,7 @@ function Products() {
     setDeleteLoading(true);
     try {
       // Simulate API call
-      // await API.delete(`/foods/${selectedFood.id}`);
+      await API.delete(`/product/${selectedFood.id}`);
 
       message.success("Product deleted successfully!");
       setIsDeleteModalOpen(false);
@@ -98,11 +91,6 @@ function Products() {
       dataIndex: "product_name",
       key: "product_name",
     },
-    // {
-    //   title: "Description",
-    //   dataIndex: "description",
-    //   key: "description",
-    // },
     {
       title: "Images",
       dataIndex: "images",

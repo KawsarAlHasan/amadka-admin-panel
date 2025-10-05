@@ -13,7 +13,11 @@ import {
   Card,
   Tag,
 } from "antd";
-import { UploadOutlined, DeleteOutlined, EditOutlined } from "@ant-design/icons";
+import {
+  UploadOutlined,
+  DeleteOutlined,
+  EditOutlined,
+} from "@ant-design/icons";
 import { API, useGetAllAgents, useGetAllCategories } from "../../api/api";
 
 const { TextArea } = Input;
@@ -52,24 +56,26 @@ const EditProduct = ({ refetch, product }) => {
       setColors(product.colors || []);
 
       // Set affiliates data
-      const agentIds = product.affiliates?.map(affiliate => affiliate.agentId) || [];
+      const agentIds =
+        product.affiliates?.map((affiliate) => affiliate.agentId) || [];
       setSelectedAgents(agentIds);
 
       // Set affiliate links
       const links = {};
-      product.affiliates?.forEach(affiliate => {
+      product.affiliates?.forEach((affiliate) => {
         links[affiliate.agentId] = affiliate.affiliate_link;
       });
       setAffiliateLinks(links);
 
       // Set existing images for display (read-only)
-      const existingImages = product.images?.map((image, index) => ({
-        uid: `existing-${index}`,
-        name: `image-${index}.jpg`,
-        status: 'done',
-        url: image,
-        thumbUrl: image,
-      })) || [];
+      const existingImages =
+        product.images?.map((image, index) => ({
+          uid: `existing-${index}`,
+          name: `image-${index}.jpg`,
+          status: "done",
+          url: image,
+          thumbUrl: image,
+        })) || [];
       setImageList(existingImages);
     }
   }, [product, isModalOpen, form]);
@@ -110,7 +116,7 @@ const EditProduct = ({ refetch, product }) => {
       formData.append("affiliates", JSON.stringify(affiliates));
 
       // Add only new image files (exclude existing URLs)
-      const newImageFiles = imageList.filter(file => file.originFileObj);
+      const newImageFiles = imageList.filter((file) => file.originFileObj);
       newImageFiles.forEach((file) => {
         if (file.originFileObj) {
           formData.append("images", file.originFileObj);
@@ -118,7 +124,11 @@ const EditProduct = ({ refetch, product }) => {
       });
 
       // If no new images but existing images, keep the existing ones
-      if (newImageFiles.length === 0 && product.images && product.images.length > 0) {
+      if (
+        newImageFiles.length === 0 &&
+        product.images &&
+        product.images.length > 0
+      ) {
         formData.append("existing_images", JSON.stringify(product.images));
       }
 
@@ -138,7 +148,8 @@ const EditProduct = ({ refetch, product }) => {
       }
     } catch (error) {
       message.error(
-        error.response?.data?.message || "Please fill in all the required fields."
+        error.response?.data?.message ||
+          "Please fill in all the required fields."
       );
     } finally {
       setLoading(false);
@@ -199,7 +210,7 @@ const EditProduct = ({ refetch, product }) => {
 
   // Function to handle image removal
   const handleImageRemove = (file) => {
-    const newImageList = imageList.filter(item => item.uid !== file.uid);
+    const newImageList = imageList.filter((item) => item.uid !== file.uid);
     setImageList(newImageList);
   };
 
@@ -319,21 +330,22 @@ const EditProduct = ({ refetch, product }) => {
           <Form.Item
             label="Product Images"
             rules={[
-              { 
-                required: imageList.length === 0, 
-                message: "Please upload at least one image!" 
+              {
+                required: imageList.length === 0,
+                message: "Please upload at least one image!",
               },
             ]}
           >
-            <Upload 
-              {...uploadProps} 
+            <Upload
+              {...uploadProps}
               fileList={imageList}
               onRemove={handleImageRemove}
             >
               <Button icon={<UploadOutlined />}>Upload Images</Button>
             </Upload>
-            <div style={{ marginTop: 8, fontSize: 12, color: '#999' }}>
-              Existing images will be kept unless removed. Upload new images to add more.
+            <div style={{ marginTop: 8, fontSize: 12, color: "#999" }}>
+              Existing images will be kept unless removed. Upload new images to
+              add more.
             </div>
           </Form.Item>
 
@@ -342,9 +354,9 @@ const EditProduct = ({ refetch, product }) => {
           <Form.Item
             label="Select Agents"
             rules={[
-              { 
-                required: selectedAgents.length === 0, 
-                message: "Please select at least one agent!" 
+              {
+                required: selectedAgents.length === 0,
+                message: "Please select at least one agent!",
               },
             ]}
           >
