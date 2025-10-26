@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 
 export const API = axios.create({
-  baseURL: "http://localhost:3000/api",
+  baseURL: "https://websheetnode.dsrt321.online/api",
 });
 
 API.interceptors.request.use((config) => {
